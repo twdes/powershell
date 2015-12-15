@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="DEMpowershell"
+           targetNamespace="http://tecware-gmbh.de/dev/des/2015/powershell"
+           elementFormDefault="qualified"
+           xmlns="http://tecware-gmbh.de/dev/des/2014"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+					 xmlns:o="http://tecware-gmbh.de/dev/des/2015/powershell">
+
+	<xs:import namespace="http://tecware-gmbh.de/dev/des/2014" />
+
+	<xs:element name="powershell" substitutionGroup="configItem">
+		<xs:annotation>
+			<xs:documentation>Runs a powershell script as a cron job.</xs:documentation>
+			<xs:appinfo>
+				<class>TecWare.DE.PowerShellCronItem</class>
+			</xs:appinfo>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="CronJobItemType">
+					<xs:attribute name="file" use="required" type="PathType">
+						<xs:annotation>
+							<xs:documentation>Path to the powershell script.</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

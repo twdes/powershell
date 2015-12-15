@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<des xmlns="http://tecware-gmbh.de/dev/des/2014"
+		 xmlns:ps="http://tecware-gmbh.de/dev/des/2015/powershell"
+     version="330"
+     displayname="Test">
+
+	<server logpath="D:\Temp\Log">
+		<resolve>..\bin\Debug</resolve>
+		<load>DEM.powershell</load>
+	</server>
+
+	<http threads="1">
+		<prefix>http://localhost:8080/</prefix>
+	</http>
+
+	<cron />
+	<luaengine />
+
+	<ps:powershell name="TestScript" bound="1,*" file="Test.ps1" />
+</des>
