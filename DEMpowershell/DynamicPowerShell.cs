@@ -96,11 +96,24 @@ namespace TecWare.DE
 				host.Log.Except(value);
 			} // proc WriteErrorLine
 
+			public override void WriteLine()
+			{
+				WriteLine(String.Empty);
+			} // proc WriteLine
+
+			public override void WriteLine(ConsoleColor foregroundColor, ConsoleColor backgroundColor, string value)
+			{
+				WriteLine(value);
+			} // proc WriteLine
+
 			public override void WriteLine(string value)
 			{
 				currentLine.Append(value);
-				host.Log.Info(currentLine.ToString());
-				currentLine.Length = 0;
+				if (currentLine.Length > 0)
+				{
+					host.Log.Info(currentLine.ToString());
+					currentLine.Length = 0;
+				}
 			} // proc WriteLine
 
 			public override void WriteProgress(long sourceId, ProgressRecord record)
@@ -212,6 +225,9 @@ namespace TecWare.DE
 			this.host = new DynamicPsHost(this);
 			this.runspace = RunspaceFactory.CreateRunspace(host, InitialSessionState.CreateDefault());
 			runspace.Open();
+
+			// activate verbose
+			runspace.SessionStateProxy.SetVariable("VerbosePreference", "Continue");
 		} // ctor
 		
 		public void Dispose()
@@ -227,6 +243,7 @@ namespace TecWare.DE
 			// create a pipeline
 			var pipe = runspace.CreatePipeline();
 			pipe.Commands.AddScript(scriptContent);
+			
 			pipe.Invoke();
 		} // proc InvokeScript
 	} // class DynamicPowerShell
