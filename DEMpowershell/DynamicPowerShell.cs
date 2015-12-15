@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -26,9 +27,61 @@ namespace TecWare.DE
 		/// <summary></summary>
 		private sealed class DynamicPsUserInterface : PSHostUserInterface
 		{
+			#region -- class ProgressInfo ---------------------------------------------------
+
+			private sealed class ProgressInfo
+			{
+				private readonly Stopwatch stopWatch = Stopwatch.StartNew();
+				private readonly StringBuilder statusText = new StringBuilder();
+				
+				private string currentActivity = String.Empty;
+				private string currentStatusText = String.Empty;
+				
+				public ProgressInfo(string activity)
+				{
+					currentStatusText = activity;
+					statusText.AppendLine(activity);
+				} // ctor
+
+				public void UpdateActivity(string newActivity)
+				{
+					if (String.IsNullOrEmpty(newActivity))
+						return;
+
+					if (String.Compare(currentActivity, newActivity, StringComparison.OrdinalIgnoreCase) != 0)
+					{
+						currentActivity = newActivity;
+						statusText.AppendLine($">> {currentActivity} <<");
+          }
+				} // proc UpdateActivity
+
+				public void UpdateStatusText(string newStatusText)
+				{
+					if (String.IsNullOrEmpty(newStatusText))
+						return;
+
+					if (String.Compare(currentStatusText, newStatusText, StringComparison.OrdinalIgnoreCase) != 0)
+					{
+						currentStatusText = newStatusText;
+						statusText.AppendLine(currentStatusText);
+					}
+				} // proc UpdateStatusText
+
+				public void AppendTime()
+				{
+					statusText.AppendLine($"=== Duration = {stopWatch.ElapsedMilliseconds:N0}ms, {stopWatch.ElapsedTicks:N0}ticks ===");
+				} // proc AppendTime
+
+				public string ProgressText => statusText.ToString();
+			} // class ProgressInfo
+
+			#endregion
+
 			private readonly DynamicPsHost host;
 
 			private StringBuilder currentLine = new StringBuilder();
+
+			private Dictionary<int, ProgressInfo> progress = new Dictionary<int, ProgressInfo>();
 
 			#region -- Ctor/Dtor ------------------------------------------------------------
 
@@ -118,6 +171,24 @@ namespace TecWare.DE
 
 			public override void WriteProgress(long sourceId, ProgressRecord record)
 			{
+				ProgressInfo pi;
+				if (record.RecordType == ProgressRecordType.Completed)
+				{
+					if (progress.TryGetValue(record.ActivityId, out pi))
+					{
+						pi.AppendTime();
+						WriteVerboseLine(pi.ProgressText);
+					}
+				}
+				else
+				{
+					if (progress.TryGetValue(record.ActivityId, out pi))
+						pi.UpdateActivity(record.Activity);
+					else
+						progress[record.ActivityId] = pi = new ProgressInfo(record.Activity);
+
+					pi.UpdateStatusText(record.CurrentOperation);
+				}
 			} // proc WriteProgress
 
 			public override void WriteVerboseLine(string message)
