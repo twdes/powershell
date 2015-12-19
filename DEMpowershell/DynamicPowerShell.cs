@@ -4,23 +4,41 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
-using System.Linq;
 using System.Management.Automation;
 using System.Management.Automation.Host;
 using System.Management.Automation.Runspaces;
 using System.Security;
 using System.Text;
-using System.Threading.Tasks;
 using TecWare.DE.Server;
 using TecWare.DE.Stuff;
 
 namespace TecWare.DE
 {
+	///////////////////////////////////////////////////////////////////////////////
+	/// <summary></summary>
+	public sealed class DynamicPowerShellProgressArgs : EventArgs
+	{
+		private readonly ProgressRecord progressRecord;
+
+		public DynamicPowerShellProgressArgs(ProgressRecord progressRecord)
+		{
+			this.progressRecord = progressRecord;
+		} // ctor
+
+		public string Activity => progressRecord.Activity;
+		public string CurrentOperation => progressRecord.CurrentOperation;
+		public string StatusDescription => progressRecord.StatusDescription;
+		public int PrecentComplete => progressRecord.PercentComplete;
+		public int SecondsRemaining => progressRecord.SecondsRemaining;
+	} // DynamicPowerShellProgressArgs
 
 	///////////////////////////////////////////////////////////////////////////////
 	/// <summary></summary>
 	public sealed class DynamicPowerShell
 	{
+		public event EventHandler<DynamicPowerShellProgressArgs> Progress;
+		public event EventHandler ProgressCompleted;
+
 		#region -- class DynamicPsUserInterface -------------------------------------------
 
 		///////////////////////////////////////////////////////////////////////////////
@@ -69,7 +87,7 @@ namespace TecWare.DE
 
 				public void AppendTime()
 				{
-					statusText.AppendLine($"=== Duration = {stopWatch.ElapsedMilliseconds:N0}ms, {stopWatch.ElapsedTicks:N0}ticks ===");
+					statusText.AppendLine($"=== Duration = {stopWatch.ElapsedMilliseconds:N0}ms, {stopWatch} ===");
 				} // proc AppendTime
 
 				public string ProgressText => statusText.ToString();
@@ -80,8 +98,7 @@ namespace TecWare.DE
 			private readonly DynamicPsHost host;
 
 			private StringBuilder currentLine = new StringBuilder();
-
-			private Dictionary<int, ProgressInfo> progress = new Dictionary<int, ProgressInfo>();
+			private Dictionary<long, ProgressInfo> progress = new Dictionary<long, ProgressInfo>();
 
 			#region -- Ctor/Dtor ------------------------------------------------------------
 
@@ -174,20 +191,23 @@ namespace TecWare.DE
 				ProgressInfo pi;
 				if (record.RecordType == ProgressRecordType.Completed)
 				{
-					if (progress.TryGetValue(record.ActivityId, out pi))
+					if (progress.TryGetValue(sourceId, out pi))
 					{
 						pi.AppendTime();
 						WriteVerboseLine(pi.ProgressText);
+						host.PowerShell.ProgressCompleted?.Invoke(host.PowerShell, EventArgs.Empty);
 					}
 				}
 				else
 				{
-					if (progress.TryGetValue(record.ActivityId, out pi))
+					if (progress.TryGetValue(sourceId, out pi))
 						pi.UpdateActivity(record.Activity);
 					else
-						progress[record.ActivityId] = pi = new ProgressInfo(record.Activity);
+						progress[sourceId] = pi = new ProgressInfo(record.Activity);
 
 					pi.UpdateStatusText(record.CurrentOperation);
+
+					host.PowerShell.Progress?.Invoke(host.PowerShell, new DynamicPowerShellProgressArgs(record));
 				}
 			} // proc WriteProgress
 
@@ -215,7 +235,7 @@ namespace TecWare.DE
 		private sealed class DynamicPsHost : PSHost, IServiceProvider
 		{
 			private readonly Guid instanceId;
-			private readonly DynamicPowerShell powershell;
+			private readonly DynamicPowerShell powerShell;
 			private readonly DynamicPsUserInterface ui;
 
 			private readonly LoggerProxy log;
@@ -226,7 +246,7 @@ namespace TecWare.DE
 					throw new ArgumentNullException("powershell");
 
 				this.instanceId = Guid.NewGuid();
-				this.powershell = powershell;
+				this.powerShell = powershell;
 				this.ui = new DynamicPsUserInterface(this);
 
 				this.log = LoggerProxy.Create(this.GetService<ILogger>(false), "Powershell");
@@ -258,7 +278,7 @@ namespace TecWare.DE
 			} // proc SetShouldExit
 
 			public object GetService(Type serviceType)
-				=> powershell.sp?.GetService(serviceType);
+				=> powerShell.sp?.GetService(serviceType);
 
 			public override Guid InstanceId => instanceId;
 
@@ -281,6 +301,8 @@ namespace TecWare.DE
 			public bool VerboseDebug => false;
 
 			public LoggerProxy Log => log;
+
+			public DynamicPowerShell PowerShell => powerShell;
 		} // class DynamicPsHost
 
 		#endregion
@@ -310,7 +332,10 @@ namespace TecWare.DE
 		{
 			// read complete script
 			string scriptContent = File.ReadAllText(scriptPath);
-			
+
+			// set path
+			runspace.SessionStateProxy.Path.SetLocation(Path.GetDirectoryName(scriptPath));
+
 			// create a pipeline
 			var pipe = runspace.CreatePipeline();
 			pipe.Commands.AddScript(scriptContent);
