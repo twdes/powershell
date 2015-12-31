@@ -87,7 +87,7 @@ namespace TecWare.DE
 
 				public void AppendTime()
 				{
-					statusText.AppendLine($"=== Duration = {stopWatch.ElapsedMilliseconds:N0}ms, {stopWatch} ===");
+					statusText.AppendLine($"=== Duration = {stopWatch.ElapsedMilliseconds:N0}ms, {stopWatch.Elapsed} ===");
 				} // proc AppendTime
 
 				public string ProgressText => statusText.ToString();
