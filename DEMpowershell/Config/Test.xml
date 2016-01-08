@@ -14,7 +14,9 @@
 	</http>
 
 	<cron />
-	<luaengine />
+	<luaengine>
+		<script id="Test" filename="Test.lua" />
+	</luaengine>
 
-	<ps:powershell name="TestScript" bound="1,*" file="Test.ps1" />
+	<ps:powershell name="TestScript" bound="1,*" file="Test.ps1" script="Test" />
 </des>
