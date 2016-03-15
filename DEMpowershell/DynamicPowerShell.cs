@@ -14,6 +14,8 @@ using TecWare.DE.Stuff;
 
 namespace TecWare.DE
 {
+	#region -- class DynamicPowerShellProgressArgs --------------------------------------
+
 	///////////////////////////////////////////////////////////////////////////////
 	/// <summary></summary>
 	public sealed class DynamicPowerShellProgressArgs : EventArgs
@@ -31,6 +33,8 @@ namespace TecWare.DE
 		public int PrecentComplete => progressRecord.PercentComplete;
 		public int SecondsRemaining => progressRecord.SecondsRemaining;
 	} // DynamicPowerShellProgressArgs
+
+	#endregion
 
 	///////////////////////////////////////////////////////////////////////////////
 	/// <summary></summary>
@@ -157,8 +161,7 @@ namespace TecWare.DE
 
 			public override void WriteDebugLine(string message)
 			{
-				if (host.VerboseDebug)
-					host.Log.Info(message);
+				host.Log.Info(message);
 			} // proc WriteDebugLine
 
 			public override void WriteErrorLine(string value)
@@ -296,9 +299,7 @@ namespace TecWare.DE
 
 			public override PSHostUserInterface UI => ui;
 
-			public override Version Version => new Version(1, 0, 0, 0);
-
-			public bool VerboseDebug => false;
+			public override Version Version => powerShell.runspace.Version;
 
 			public LoggerProxy Log => log;
 
@@ -316,11 +317,14 @@ namespace TecWare.DE
 			this.sp = sp;
 
 			this.host = new DynamicPsHost(this);
-			this.runspace = RunspaceFactory.CreateRunspace(host, InitialSessionState.CreateDefault());
-			runspace.Open();
 
+			// create the runspace
+			this.runspace = RunspaceFactory.CreateRunspace(host, InitialSessionState.CreateDefault2());
+			runspace.Open();
+			
 			// activate verbose
 			runspace.SessionStateProxy.SetVariable("VerbosePreference", "Continue");
+			//runspace.SessionStateProxy.SetVariable("DebugPreference", "Continue");
 		} // ctor
 		
 		public void Dispose()
@@ -335,7 +339,7 @@ namespace TecWare.DE
 
 			// set path
 			runspace.SessionStateProxy.Path.SetLocation(Path.GetDirectoryName(scriptPath));
-
+						
 			// create a pipeline
 			var pipe = runspace.CreatePipeline();
 			pipe.Commands.AddScript(scriptContent);
