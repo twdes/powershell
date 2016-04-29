@@ -55,10 +55,10 @@ namespace TecWare.DE
 			{
 				private readonly Stopwatch stopWatch = Stopwatch.StartNew();
 				private readonly StringBuilder statusText = new StringBuilder();
-				
+
 				private string currentActivity = String.Empty;
 				private string currentStatusText = String.Empty;
-				
+
 				public ProgressInfo(string activity)
 				{
 					currentStatusText = activity;
@@ -74,7 +74,7 @@ namespace TecWare.DE
 					{
 						currentActivity = newActivity;
 						statusText.AppendLine($">> {currentActivity} <<");
-          }
+					}
 				} // proc UpdateActivity
 
 				public void UpdateStatusText(string newStatusText)
@@ -321,17 +321,17 @@ namespace TecWare.DE
 			// create the runspace
 			this.runspace = RunspaceFactory.CreateRunspace(host, InitialSessionState.CreateDefault2());
 			runspace.Open();
-			
+
 			// activate verbose
 			runspace.SessionStateProxy.SetVariable("VerbosePreference", "Continue");
 			//runspace.SessionStateProxy.SetVariable("DebugPreference", "Continue");
 		} // ctor
-		
+
 		public void Dispose()
 		{
 			runspace.Dispose();
 		} // proc Dispose
-		
+
 		public void InvokeScript(string scriptPath)
 		{
 			// read complete script
@@ -339,12 +339,14 @@ namespace TecWare.DE
 
 			// set path
 			runspace.SessionStateProxy.Path.SetLocation(Path.GetDirectoryName(scriptPath));
-						
+
 			// create a pipeline
-			var pipe = runspace.CreatePipeline();
-			pipe.Commands.AddScript(scriptContent);
-			
-			pipe.Invoke();
+			using (var pipe = runspace.CreatePipeline())
+			{
+				pipe.Commands.AddScript(scriptContent);
+
+				pipe.Invoke();
+			}
 		} // proc InvokeScript
 	} // class DynamicPowerShell
 }
