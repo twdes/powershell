@@ -68,6 +68,9 @@
     <Content Include="Config\Test.xml" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\..\Server\des.licenseheader">
+      <Link>des.licenseheader</Link>
+    </None>
     <None Include="Config\Progress.ps1" />
     <None Include="Config\Test.lua" />
     <None Include="Config\Test.ps1" />
