@@ -1,4 +1,19 @@
-﻿using System;
+﻿#region -- copyright --
+//
+// Licensed under the EUPL, Version 1.1 or - as soon they will be approved by the
+// European Commission - subsequent versions of the EUPL(the "Licence"); You may
+// not use this work except in compliance with the Licence.
+//
+// You may obtain a copy of the Licence at:
+// http://ec.europa.eu/idabc/eupl
+//
+// Unless required by applicable law or agreed to in writing, software distributed
+// under the Licence is distributed on an "AS IS" basis, WITHOUT WARRANTIES OR
+// CONDITIONS OF ANY KIND, either express or implied. See the Licence for the
+// specific language governing permissions and limitations under the Licence.
+//
+#endregion
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
@@ -14,42 +29,50 @@ using TecWare.DE.Stuff;
 
 namespace TecWare.DE
 {
-	#region -- class DynamicPowerShellProgressArgs --------------------------------------
+	#region -- class DynamicPowerShellProgressArgs ------------------------------------
 
-	///////////////////////////////////////////////////////////////////////////////
 	/// <summary></summary>
 	public sealed class DynamicPowerShellProgressArgs : EventArgs
 	{
 		private readonly ProgressRecord progressRecord;
 
+		/// <summary></summary>
+		/// <param name="progressRecord"></param>
 		public DynamicPowerShellProgressArgs(ProgressRecord progressRecord)
 		{
 			this.progressRecord = progressRecord;
 		} // ctor
 
+		/// <summary></summary>
 		public string Activity => progressRecord.Activity;
+		/// <summary></summary>
 		public string CurrentOperation => progressRecord.CurrentOperation;
+		/// <summary></summary>
 		public string StatusDescription => progressRecord.StatusDescription;
+		/// <summary></summary>
 		public int PrecentComplete => progressRecord.PercentComplete;
+		/// <summary></summary>
 		public int SecondsRemaining => progressRecord.SecondsRemaining;
 	} // DynamicPowerShellProgressArgs
 
 	#endregion
 
-	///////////////////////////////////////////////////////////////////////////////
+	#region -- class DynamicPowerShell ------------------------------------------------
+
 	/// <summary></summary>
 	public sealed class DynamicPowerShell
 	{
+		/// <summary></summary>
 		public event EventHandler<DynamicPowerShellProgressArgs> Progress;
+		/// <summary></summary>
 		public event EventHandler ProgressCompleted;
 
-		#region -- class DynamicPsUserInterface -------------------------------------------
+		#region -- class DynamicPsUserInterface ---------------------------------------
 
-		///////////////////////////////////////////////////////////////////////////////
 		/// <summary></summary>
 		private sealed class DynamicPsUserInterface : PSHostUserInterface
 		{
-			#region -- class ProgressInfo ---------------------------------------------------
+			#region -- class ProgressInfo ---------------------------------------------
 
 			private sealed class ProgressInfo
 			{
@@ -90,9 +113,7 @@ namespace TecWare.DE
 				} // proc UpdateStatusText
 
 				public void AppendTime()
-				{
-					statusText.AppendLine($"=== Duration = {stopWatch.ElapsedMilliseconds:N0}ms, {stopWatch.Elapsed} ===");
-				} // proc AppendTime
+					=> statusText.AppendLine($"=== Duration = {stopWatch.ElapsedMilliseconds:N0}ms, {stopWatch.Elapsed} ===");
 
 				public string ProgressText => statusText.ToString();
 			} // class ProgressInfo
@@ -104,7 +125,7 @@ namespace TecWare.DE
 			private StringBuilder currentLine = new StringBuilder();
 			private Dictionary<long, ProgressInfo> progress = new Dictionary<long, ProgressInfo>();
 
-			#region -- Ctor/Dtor ------------------------------------------------------------
+			#region -- Ctor/Dtor ------------------------------------------------------
 
 			public DynamicPsUserInterface(DynamicPsHost host)
 			{
@@ -113,71 +134,47 @@ namespace TecWare.DE
 
 			#endregion
 
-			#region -- Prompt, Readline -----------------------------------------------------
+			#region -- Prompt, Readline -----------------------------------------------
 
 			public override Dictionary<string, PSObject> Prompt(string caption, string message, Collection<FieldDescription> descriptions)
-			{
-				throw new NotImplementedException();
-			}
+				=> throw new NotImplementedException();
 
 			public override int PromptForChoice(string caption, string message, Collection<ChoiceDescription> choices, int defaultChoice)
-			{
-				throw new NotImplementedException();
-			}
+				=> throw new NotImplementedException();
 
 			public override PSCredential PromptForCredential(string caption, string message, string userName, string targetName)
-			{
-				throw new NotImplementedException();
-			}
+				=> throw new NotImplementedException();
 
 			public override PSCredential PromptForCredential(string caption, string message, string userName, string targetName, PSCredentialTypes allowedCredentialTypes, PSCredentialUIOptions options)
-			{
-				throw new NotImplementedException();
-			}
+				=> throw new NotImplementedException();
 
 			public override string ReadLine()
-			{
-				throw new NotImplementedException();
-			}
+				=> throw new NotImplementedException();
 
 			public override SecureString ReadLineAsSecureString()
-			{
-				throw new NotImplementedException();
-			}
+				=> throw new NotImplementedException();
 
 			#endregion
 
-			#region -- Write ----------------------------------------------------------------
+			#region -- Write ----------------------------------------------------------
 
 			public override void Write(string value)
-			{
-				currentLine.Append(value);
-			} // proc Write
+				=> currentLine.Append(value);
 
 			public override void Write(ConsoleColor foregroundColor, ConsoleColor backgroundColor, string value)
-			{
-				currentLine.Append(value);
-			} // proc Write
+				=> currentLine.Append(value);
 
 			public override void WriteDebugLine(string message)
-			{
-				host.Log.Info(message);
-			} // proc WriteDebugLine
+				=> host.Log.Info(message);
 
 			public override void WriteErrorLine(string value)
-			{
-				host.Log.Except(value);
-			} // proc WriteErrorLine
+				=> host.Log.Except(value);
 
 			public override void WriteLine()
-			{
-				WriteLine(String.Empty);
-			} // proc WriteLine
+				=> WriteLine(String.Empty);
 
 			public override void WriteLine(ConsoleColor foregroundColor, ConsoleColor backgroundColor, string value)
-			{
-				WriteLine(value);
-			} // proc WriteLine
+				=> WriteLine(value);
 
 			public override void WriteLine(string value)
 			{
@@ -215,14 +212,10 @@ namespace TecWare.DE
 			} // proc WriteProgress
 
 			public override void WriteVerboseLine(string message)
-			{
-				host.Log.Info(message);
-			} // proc WriteVerboseLine
+				=> host.Log.Info(message);
 
 			public override void WriteWarningLine(string message)
-			{
-				host.Log.Warn(message);
-			} // proc WriteWarningLine
+				=> host.Log.Warn(message);
 
 			#endregion
 
@@ -231,9 +224,8 @@ namespace TecWare.DE
 
 		#endregion
 
-		#region -- class DynamicPsHost ----------------------------------------------------
+		#region -- class DynamicPsHost ------------------------------------------------
 
-		///////////////////////////////////////////////////////////////////////////////
 		/// <summary></summary>
 		private sealed class DynamicPsHost : PSHost, IServiceProvider
 		{
@@ -245,40 +237,27 @@ namespace TecWare.DE
 
 			public DynamicPsHost(DynamicPowerShell powershell)
 			{
-				if (powershell == null)
-					throw new ArgumentNullException("powershell");
-
 				this.instanceId = Guid.NewGuid();
-				this.powerShell = powershell;
+				this.powerShell = powershell ?? throw new ArgumentNullException("powershell");
 				this.ui = new DynamicPsUserInterface(this);
 
 				this.log = LoggerProxy.Create(this.GetService<ILogger>(false), "Powershell");
 			} // ctor
 
 			public override void EnterNestedPrompt()
-			{
-				throw new NotSupportedException();
-			} // proc EnterNestedPrompt
+				=> throw new NotSupportedException();
 
 			public override void ExitNestedPrompt()
-			{
-				throw new NotSupportedException();
-			} // proc ExitNestedPrompt
+				=> throw new NotSupportedException();
 
 			public override void NotifyBeginApplication()
-			{
-				log.Info("Begin of application");
-			} // proc NotifyBeginApplication
+				=> log.Info("Begin of application");
 
 			public override void NotifyEndApplication()
-			{
-				log.Info("End of application");
-			} // proc NotifyEndApplication
+				=> log.Info("End of application");
 
 			public override void SetShouldExit(int exitCode)
-			{
-				log.Except("Exit requested: {0}", exitCode);
-			} // proc SetShouldExit
+				=> log.Except("Exit requested: {0}", exitCode);
 
 			public object GetService(Type serviceType)
 				=> powerShell.sp?.GetService(serviceType);
@@ -312,6 +291,8 @@ namespace TecWare.DE
 		private readonly DynamicPsHost host;
 		private readonly Runspace runspace;
 
+		/// <summary></summary>
+		/// <param name="sp"></param>
 		public DynamicPowerShell(IServiceProvider sp)
 		{
 			this.sp = sp;
@@ -327,15 +308,16 @@ namespace TecWare.DE
 			//runspace.SessionStateProxy.SetVariable("DebugPreference", "Continue");
 		} // ctor
 
+		/// <summary></summary>
 		public void Dispose()
-		{
-			runspace.Dispose();
-		} // proc Dispose
+			=> runspace.Dispose();
 
+		/// <summary></summary>
+		/// <param name="scriptPath"></param>
 		public void InvokeScript(string scriptPath)
 		{
 			// read complete script
-			string scriptContent = File.ReadAllText(scriptPath);
+			var scriptContent = File.ReadAllText(scriptPath);
 
 			// set path
 			runspace.SessionStateProxy.Path.SetLocation(Path.GetDirectoryName(scriptPath));
@@ -349,4 +331,6 @@ namespace TecWare.DE
 			}
 		} // proc InvokeScript
 	} // class DynamicPowerShell
+
+	#endregion
 }
