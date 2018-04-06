@@ -24,5 +24,7 @@
 		<file src="bin\Release\DEM.powershell.pdb" target="lib\net47" />
 		<file src="bin\Release\DEM.powershell.xml" target="lib\net47" />
 		<file src="bin\Release\System.Management.Automation.dll" target="lib\net47" />
+		
+		<file src="DEMpowershell.xsd" target="content\Schema\Configuration" />
 	</files>
 </package>
