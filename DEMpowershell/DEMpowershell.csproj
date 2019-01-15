@@ -1,39 +1,29 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{0496732B-0812-4E06-B7FE-212F2761EBAF}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>TecWare.DE</RootNamespace>
     <AssemblyName>DEM.powershell</AssemblyName>
-    <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Debug\DEM.powershell.xml</DocumentationFile>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Release\DEM.powershell.xml</DocumentationFile>
-  </PropertyGroup>
+		<TargetFramework>net47</TargetFramework>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<PackageId>TecWare.DES.Module.Powershell</PackageId>
+		<Product>DEServer</Product>
+		<Authors>TecWare</Authors>
+		<Company>TecWare GmbH</Company>
+		<Description>Powershell wrapper for the data exchange server.</Description>
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<PackageProjectUrl>https://github.com/twdes/des</PackageProjectUrl>
+	</PropertyGroup>
   <ItemGroup>
-    <Reference Include="Neo.Lua, Version=5.3.0.0, Culture=neutral, PublicKeyToken=fdb0cd4fe8a6e3b2" />
+    <None Remove="DEMpowershell.xsd" />
+  </ItemGroup>
+  <ItemGroup>
+		<Content Include="DEMpowershell.xsd">
+			<Pack>true</Pack>
+			<PackagePath>content\Schema</PackagePath>
+		</Content>
+  </ItemGroup>
+  <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Management.Automation, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -48,11 +38,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DynamicPowerShell.cs" />
-    <Compile Include="PowerShellCronItem.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\..\..\ServerLib\ServerLib.csproj">
       <Project>{6a13ee24-ae1a-4242-8f61-0e32f1e9e37d}</Project>
       <Name>ServerLib</Name>
@@ -63,24 +48,12 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="DEMpowershell.xsd">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Config\Test.xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\..\..\Server\des.licenseheader">
-      <Link>des.licenseheader</Link>
-    </None>
-    <None Include="Config\Progress.ps1" />
-    <None Include="Config\Test.lua" />
-    <None Include="Config\Test.ps1" />
-    <None Include="TecWare.DES.Module.Powershell.nuspec" />
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+		<Folder Include="Properties\" />
+	</ItemGroup>
+	<ItemGroup>
+		<None Include="..\..\..\Server\des.licenseheader" Link="des.licenseheader" />
+	</ItemGroup>
+	<!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
   </Target>
