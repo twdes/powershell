@@ -47,9 +47,6 @@
       <Name>DESCore</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-		<Folder Include="Properties\" />
-	</ItemGroup>
 	<ItemGroup>
 		<None Include="..\..\..\Server\des.licenseheader" Link="des.licenseheader" />
 	</ItemGroup>
