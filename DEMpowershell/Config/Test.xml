@@ -9,7 +9,7 @@
 		<load>DEM.powershell</load>
 	</server>
 
-	<http threads="1">
+	<http>
 		<prefix>http://localhost:8080/</prefix>
 	</http>
 
