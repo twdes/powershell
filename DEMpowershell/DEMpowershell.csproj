@@ -18,10 +18,10 @@
     <None Remove="DEMpowershell.xsd" />
   </ItemGroup>
   <ItemGroup>
-		<Content Include="DEMpowershell.xsd">
+		<EmbeddedResource Include="DEMpowershell.xsd">
 			<Pack>true</Pack>
 			<PackagePath>content\Schema</PackagePath>
-		</Content>
+		</EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -47,7 +47,7 @@
 		<None Include="..\..\..\Server\des.licenseheader" Link="des.licenseheader" />
 	</ItemGroup>
 	<ItemGroup>
-	  <PackageReference Include="System.Management.Automation" Version="6.1.2" />
+	  <PackageReference Include="System.Management.Automation.dll" Version="10.0.10586" />
 	</ItemGroup>
 	<!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
