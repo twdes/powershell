@@ -3,7 +3,7 @@
   <PropertyGroup>
     <RootNamespace>TecWare.DE</RootNamespace>
     <AssemblyName>DEM.powershell</AssemblyName>
-		<TargetFramework>net47</TargetFramework>
+		<TargetFramework>net48</TargetFramework>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<PackageId>TecWare.DES.Module.Powershell</PackageId>
 		<Product>DEServer</Product>
